@@ -154,34 +154,257 @@
 - 构造函数不能有返回类型
 - 构造函数可以不止一个，参数个数可以不同即可（重载）
 ### 6.4 对象的交互
-package clock;
+    package clock;
 
-public class Display {
-	
-	private int value = 0;
-	private int limit = 0;
-	
-	public Display(int limit) {
-		this.limit = limit;
-	}
-	
-	public void increase() {
-		value++;
-		if (value == limit) {
-			value = 0;
-		}
-	}
-	
-	public int getValue() {
-		return value;
-	}
-	
-	public static void main(String[] args) {
-		Display d = new Display(24);
-		for (int i=0; i<1000 ; i++) {
-			d.increase();
-			System.out.println(d.getValue());
-		}
-	}
+    class Display {
+        
+        private int value = 0;
+        private int limit = 0;
+        
+        public Display(int limit) {
+            this.limit = limit;
+        }
+        
+        public void increase() {
+            value++;
+            if (value == limit) {
+                value = 0;
+            }
+        }
+        
+        public int getValue() {
+            return value;
+        }
+    }
 
-}
+    public class Clock {
+        
+        private Display hour = new Display(24);
+        private Display minute = new Display(60);
+        
+        public void start() {
+            int x = 0;
+            while (x++ < 1000) {
+                minute.increase();
+                if (minute.getValue() == 0) {
+                    hour.increase();
+                }
+                System.out.printf("%02d:%02d\n", hour.getValue(), minute.getValue());
+            }
+            
+        }
+        
+        public static void main(String[] args) {
+            // TODO Auto-generated method stub
+            Clock clock = new Clock();
+            clock.start();
+        }
+
+    }
+### 6.5 private
+>只有这个类内部可以访问，即成员函数中可以访问，这个限制是对类的而非对对象的，因为成员函数中可以包涵对同类的其他对象的操作。
+
+### 6.6 public
+>一个编译单元(.java文件)只能有一个public类，且类名与文件名相同。还有一种情况，既没有private也没有public关键字，那么它是friendly的，可以被同一个包中的其他类访问。
+
+### 6.7 类变量
+>当成员变量之前有static关键字的时候，该成员变量成为类变量，不再为某一对象独自拥有，而是被该类全体所有，某一对象的类变量改变，其余对象的该类变量随之改变。可以用Class.var访问，也可以用c.var访问。
+
+### 6.8 类函数
+>当函数之前带有static时，成员函数变为类函数，它只能对类变量进行操作，同样地，它能被类访问，也能被对象访问。
+
+### 6.9 toString函数
+>当类中有public String toString() 函数时，在打印该类的某一个对象时，可以成功显示有意义的字符串
+
+    package notebook;
+
+    public class NoteBook {
+        private int x = 10;
+        
+        public String toString() {
+            return "" + x;
+        }
+        
+        public static void main(String[] args) {
+            // TODO Auto-generated method stub
+            NoteBook nb = new NoteBook();
+            System.out.println(nb);
+        }
+    }
+
+
+## 7 容器
+### 7.1 容器类
+    private ArrayList<String> notes = new ArrayList<String>();
+
+- ArrayList是容器的类型
+- String是元素的类型
+
+### 7.2 ArrayList
+    package notebook;
+
+    import java.util.ArrayList;
+
+    public class NoteBook {
+        private ArrayList<String> notes = new ArrayList<String>();
+        public void add(String s) {
+            notes.add(s);
+        }
+
+        public void add(String s, int location) {
+            notes.add(location, s);
+        }
+
+        public int getSize() {
+            return notes.size();
+        }
+
+        public String getNote(int index) {
+            return notes.get(index);
+        }
+
+        public boolean removeNote(int index) {
+            return true;
+        }
+
+        public String[] list() {
+            String[] a = new String[notes.size()];
+            notes.toArray(a);
+            return a;
+        }
+            
+        public static void main(String[] args) {
+            // TODO Auto-generated method stub
+            NoteBook nb = new NoteBook();
+            nb.add("first");
+            nb.add("second");
+            nb.add("third",1);
+            String[] a = nb.list();
+            for (String s : a) {
+                System.out.println(s);
+            }
+        }
+    }
+
+- .add()
+- .get()
+- .toArray()
+
+### 7.3 HashSet
+    HashSet<String> s = new HashSet<String>()
+- .add()
+
+### 7.4 HashMap
+    HashMap<Integer, String> hm = new HashMap<Integer, String>();
+    hm.put(key, value);
+    hm.get(key);
+    hm.containsKey();
+    hm.KeySet().size();
+    for (Integer k : hm.KeySet()) {
+        String s = hm.get(k);
+        System.out.println(s);
+    }
+
+- <>里面不能填int，必须是Integer，因为要填入对象，而非基本数据类型。
+
+## 8 继承
+### 8.1 概念
+item.java:
+
+    package database;
+
+    public class Item {
+        private String title;
+        private int playingTime;
+        private boolean gotIt = false;
+        private String comment;
+        
+        public Item() {
+            
+        }
+        
+        
+        
+        public Item(String title, int playingTime, boolean gotIt, String comment) {
+            super();
+            this.title = title;
+            this.playingTime = playingTime;
+            this.gotIt = gotIt;
+            this.comment = comment;
+        }
+
+
+
+        public static void main(String[] args) {
+            // TODO Auto-generated method stub
+
+        }
+
+
+
+        public void print() {
+            // TODO Auto-generated method stub
+            System.out.println(title);
+        }
+    }
+CD.java:
+
+    package database;
+
+    public class CD extends Item {
+        private String artist;
+        private int numofTracks;
+
+        public CD(String title, int playingTime, String comment, String artist, int numofTracks) {
+            super(title, playingTime, false, comment);
+            this.numofTracks = numofTracks;
+            this.artist = artist;
+        }
+        
+        public void print() {
+            System.out.println(artist);
+            super.print();
+        }
+
+        public static void main(String[] args) {
+            // TODO Auto-generated method stub
+            CD cd = new CD("CD1",2,"...","CDA1",2);
+            cd.print();
+        }
+    }
+
+- 子类的super会调用父类的构造函数，父类函数可能存在重构，子类的super会根据参数表选择父类匹配的构造函数，如果没有super，则调用父类没有参数的那个构造函数。
+- 子类调用父类的函数，需加super，如super.print()
+
+### 8.2 多态变量
+- 子类的对象可以当做父类的对象来使用
+- 赋值给父类的变量
+- 传递给需要父类对象的函数
+- 放进存放父类对象的容器里
+
+**当把子类的对象赋值给父类的变量的时候，就发生了向上造型。** 
+**父类对象赋值给子类变量会报错，除非造型，CD cd = (CD)item;**
+
+### 8.3 代码优化
+>封装可以减少类之间的耦合，容器的使用可以提升代码的可扩展性（不要硬编码）。
+
+## 9 抽象
+### 9.1 例子
+    package shape;
+
+    import java.awt.Graphics;
+
+    public abstract class Shape {
+
+        public abstract void draw(Graphics g);
+
+    }
+
+- 只要有一个抽象的成员函数，该类就是抽象的。
+- 抽象类不能创建对象。
+- 抽象类可以定义变量，任何继承了这个抽象类的非抽象类的对象都可以赋值给这个变量。
+- 继承自抽象类的子类必须覆盖父类中的抽象函数，否则自己就成了抽象类。
+
+### 9.2 接口interface
+- 接口是一个纯抽象类，所有的成员函数都是抽象函数，所有成员变量都是public static final
+- 其他类可以实现很多接口。implements cell
