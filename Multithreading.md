@@ -1,0 +1,229 @@
+# 多线程
+## 1 线程的实现
+### 1.0 jar包的使用
+>jar 是 Java ARchive 的缩写，是一种基本 zip 格式的文件格式。目标是将 java 生成的类文件、资源文件、管理文件等按照特定的结构打包成一个独立的文件，方便程序的发布或网络的下载。可以将自己的代码打包成jar包，也可以使用别人写好的jar包。
+
+>Eclipse中jar包的导入：点击想要添加jar包的项目 -> Alt+Enter -> Java Build Path -> libraries -> Add External JARs
+### 1.1 继承Thread类
+>Thread是一个类，并且已经实现了Runnable接口，我们需要创建一个继承自Thread类的子类，并且重写run方法，调用该子类时，调用start()方法启动线程，若调用run()方法则还是顺序执行。
+    package thread;
+
+    public class TestThread1 extends Thread{
+        public void run() {
+            for (int i=0; i<20; i++) {
+                System.out.println("run");
+            }
+        }
+        
+        public static void main(String[] args) {
+            TestThread1 testThread1 = new TestThread1();
+            testThread1.start();
+            for (int i=0; i<200; i++) {
+                System.out.println("main");
+            }
+        }
+    }
+### 1.2 实现Runnable接口(推荐)
+>既然Thread只是实现了Runnable接口的一个类，那我们想要实现线程，自然也可以直接创建一个实现了Runnable接口的类。同样也要重写run()方法，调用线程时，创建Thread，作为参数传递我们的类，并start().
+
+    package thread;
+
+    public class TestThread3 implements Runnable{
+        
+        public void run() {
+            for (int i=0; i<200; i++) {
+                System.out.println("a");
+            }
+        }
+
+        public static void main(String[] args) {
+            // TODO Auto-generated method stub
+            TestThread3 t3 = new TestThread3();
+            // 代理
+            //	Thread thread = new Thread(t3);	
+            //	thread.start();
+            new Thread(t3).start();
+            for (int i=0; i<200; i++) {
+                System.out.println("bb");
+            }
+        }
+
+    }
+**Thread类实现了Runnable接口，Runnable接口里只有一个方法run()**
+### 1.3 并发问题
+>多个线程同时操作一个对象
+
+    package thread;
+
+    // 多个线程同时操作一个对象
+    public class TestThread4 implements Runnable{
+        int ticketNumber = 10;
+        
+        public void run() {
+            while (true) {
+                if (ticketNumber<=0) break;
+                System.out.println(Thread.currentThread().getName()+"拿到了第"+ticketNumber--+"张票");
+            }
+        }
+        
+        public static void main(String[] args) {
+            // TODO Auto-generated method stub
+            TestThread4 t4 = new TestThread4();
+            new Thread(t4,"a").start();
+            new Thread(t4,"b").start();
+            new Thread(t4,"c").start();
+        }
+    }
+>结果出现重复拿票
+
+    b拿到了第10张票
+    c拿到了第9张票
+    c拿到了第7张票
+    a拿到了第10张票
+    a拿到了第5张票
+    a拿到了第4张票
+    a拿到了第3张票
+    c拿到了第6张票
+    b拿到了第8张票
+    c拿到了第1张票
+    a拿到了第2张票
+### 1.4 实现Callable接口
+>实现Callable接口，重写call方法。
+    package thread;
+
+    import java.util.concurrent.Callable;
+    import java.util.concurrent.ExecutorService;
+    import java.util.concurrent.Executors;
+    import java.util.concurrent.Future;
+
+    public class TestCallable implements Callable<Boolean>{
+        public Boolean call() {
+            return true;
+        }
+        
+        public static void main(String[] args) {
+            TestCallable t1 = new TestCallable();
+            TestCallable t2 = new TestCallable();
+            
+            // 创建执行服务
+            ExecutorService ser = Executors.newFixedThreadPool(2);
+            
+            // 提交执行
+            Future<Boolean> r1 = ser.submit(t1);
+            Future<Boolean> r2 = ser.submit(t2);
+            
+            // 获取结果
+            boolean rs1 = r1.get();
+            boolean rs2 = r2.get();
+            
+            // 关闭服务
+            ser.shutdown();
+        }
+    }
+**可以定义返回类型**
+### 1.5 静态代理
+>真实对象和目标对象都要实现同一个接口，代理对象要代理真实角色。好处：代理对象可以去完成真实对象完成不了的事情，真实对象可以专注做自己的事情。
+
+我们在创建线程时，一种方法创建类T去实现Runnable接口，然后Thread(t).start()，在这里T和Thread都实现了Runnable接口，Thread就代理了真实角色t.
+### 1.6 lambda表达式
+>函数式接口：只包涵一个抽象方法的接口。对于函数式接口，可以通过lambda表达式创建该接口的对象。lambda表达式看上去很简单，也不好理解，下面列出它的“简化步骤”，以便于理解。
+
+    package lambda;
+
+    public class TestLambda {
+        // 2.创建静态内部类
+    //	static class CD implements Item {
+    //		public void doSomething() {
+    //			System.out.println("222");
+    //		}
+    //	}
+
+        public static void main(String[] args) {
+            // 3. 创建局部内部类
+    //		class CD implements Item {
+    //			public void doSomething() {
+    //				System.out.println("333");
+    //			}
+    //		}
+            
+            // 4. 匿名内部类，没有类的名称，必须借助接口或父类
+    //		Item item = new Item() {
+    //			public void doSomething() {
+    //				System.out.println("444");
+    //			}
+    //		};
+    //		item.doSomething();
+            
+            // 5. lambda简化
+            Item item = ()->{
+                System.out.println("555");
+            };
+            
+            item.doSomething();
+        }
+    }
+
+    // 0. 创建函数式接口
+    interface Item {
+        void doSomething();
+    }
+
+    // 1.创建一个单独的类，实现接口
+    //class CD implements Item {
+    //	public void doSomething() {
+    //		System.out.println("111");
+    //	}
+    //}
+## 2 线程的操作
+### 2.1 停止线程
+>不推荐使用JDK提供的stop(), destroy()方法，而是设置以标志位来控制线程的停止。
+
+    package lambda;
+
+    public class TestStop implements Runnable{
+        private boolean flag = true;
+
+        @Override
+        public void run() {
+            int i = 0;
+            // TODO Auto-generated method stub
+            while(flag) {
+                System.out.println(i++);
+            }
+        }
+        
+        public void stop() {
+            this.flag = false;
+        }
+        
+        public static void main(String[] args) {
+            // TODO Auto-generated method stub
+            TestStop t = new TestStop();
+            new Thread(t).start();
+            for (int i=0; i<100000; i++) {
+                if (i == 90000) t.stop();
+            }
+        }
+    }
+### 2.2 线程休眠和礼让
+>类方法
+
+    Thread.sleep(1000);
+    Thread.yield();     // 礼让不一定成功，实际上发生了进程的重新调度
+### 2.3 线程强制执行（插队）
+>不是类方法，被对象调用
+
+    thread.join();
+
+### 2.4 观测线程状态
+>不是类方法，被对象调用
+
+    Thread.state state = thread.getState();     // NEW RUNNABLE TERMINATED TIMED_WAITING...
+**注意：死亡的线程不能再start**
+### 2.5 优先级
+    thread.setPriority(10);  // 1-10,10优先级最高
+    thread.getPriority();
+
+    // 优先级要先设置，再启动
+    thread.setPriority(10);
+    thread.start();
