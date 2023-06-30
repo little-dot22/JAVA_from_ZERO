@@ -221,9 +221,41 @@
     Thread.state state = thread.getState();     // NEW RUNNABLE TERMINATED TIMED_WAITING...
 **注意：死亡的线程不能再start**
 ### 2.5 优先级
+>可以设置执行优先级，但是不一定会按照优先级执行。
+
     thread.setPriority(10);  // 1-10,10优先级最高
     thread.getPriority();
 
     // 优先级要先设置，再启动
     thread.setPriority(10);
     thread.start();
+### 2.6 守护线程
+- 线程分为用户线程和守护线程
+- 虚拟机必须确保用户线程执行完毕
+- 虚拟机不用等待用户线程执行完毕
+
+        Thread thread = new Thread(t);
+        thread.setDaemon(true);
+        thread.start();
+## 3 同步
+### 3.1 同步块
+    synchronized(Obj) {
+
+    }
+
+**注意：**
+- Obj是同步监视器，可以是任何对象，一般是共享资源
+- 方法前也可以加synchronized关键字，此时无需指定同步监视器，因为默认是this
+### 3.2 ReentrantLock
+    class A{
+        private final ReentrantLock lock = new ReentrantLock();
+        public void fun() {
+            try{
+                lock.lock();
+                ...
+            }
+        }
+        finally{
+            lock.unlock();
+        }
+    }
