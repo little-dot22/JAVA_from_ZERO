@@ -123,7 +123,7 @@
 
     }
 **注意：**
-- 不要编写返回值是引用可变对象的访问器方法，例如返回了Date对象并赋值给了d，现在d和this.date指向同一个对象，d调用setTime()方法将改变this.date，可以改为return date.clone()
+- 不要编写返回值是引用可变对象的访问器方法（所谓访问器方法就比如getDate()），例如返回了Date对象并赋值给了d，现在d和this.date指向同一个对象，d调用setTime()方法将改变this.date，可以改为return date.clone()
 - 上面的vm并不是一个对象，而是对一个对象的引用（可以叫做对象变量），真正的对象是new VendingMachine()语句new出来的对象，这类似于C++的对象指针。
 ### 6.2 成员函数和成员变量
 >在类的内部调用成员函数和成员变量时，不需要this.var或this.func，在类的外部则需要vm.var或vm.func. 成员变量的生存期是对象的生存期，作用域是类内部的成员函数。
