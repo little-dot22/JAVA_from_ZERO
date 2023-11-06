@@ -1,0 +1,248 @@
+## 第一章 初识MySQL
+### 1.1 数据库分类
+1. 关系型数据库：(SQL)
+- MySQL, Oracle, Sql Server, DB2, SQLite
+- 通过表和表之间，行和列之间的关系进行数据存储
+2. 非关系型数据库 (not only SQL)
+- Redis, MongDB
+- 非关系型数据库，对象存储，通过对象自身的属性来决定
+3. DBMS(数据库管理系统)
+- 科学有效地管理数据，维护和获取数据。
+### 1.2 MySQL
+- 是一个关系型数据库管理系统
+- 属于Oracle公司
+- 开源，体积小，成本低，速度快
+- **DBMS -> 多个数据库 -> 多张表**
+## 第二章 下载安装
+>安装之后：
+
+    net start mysql
+    mysql -u root -p123456
+    net stop mysql
+## 第三章 SQL语法
+### 3.1 SQL通用语法
+- 可以单行或多行书写，分号结尾
+- 不区分大小写，关键字建议大写
+- -- 或者 # 或者 /* */ 注释
+- 可以使用空格或者缩进增强可读性
+### 3.2 SQL分类
+1. DDL：数据定义语言，定义数据库、表、字段
+2. DML：数据操作语言，增删改
+3. DQL：数据查询语言，查
+4. DCL：数据控制语言，创建用户，控制权限
+### 3.3 DDL
+#### 3.3.1 DDL-数据库操作
+
+    # 中括号中内容可选
+
+    # 查询所有数据库
+    SHOW DATABASES;
+
+    # 查询当前数据库
+    SELECT DATABASE();
+
+    # 创建
+    CREATE DATABASE [IF NOT EXISTS] 数据库名 [DEFAULT CHARSET 字符集] [COLLATE 排序规则];
+
+    # 删除
+    DROP DATABASE [IF EXISTS] 数据库名;
+
+    # 使用
+    USE 数据库名;
+#### 3.3.2 DDL-表操作-查询
+
+    # 查询当前数据库所有表
+    SHOW TABLES;
+
+    # 查询表结构
+    DESC 表名;
+
+    # 查询制定表的建表语句
+    SHOW CREATE TABLE 表名;
+#### 3.3.3 DDL-表操作-创建
+
+    CREATE TABLE 表名(
+        字段1 字段1类型[COMMENT 字段1注释],
+        字段2 字段2类型[COMMENT 字段2注释],
+        ...
+        字段n 字段n类型[COMMENT 字段n注释]
+    ) [COMMENT 表注释];
+#### 3.3.4 DDL-表操作-数据类型
+**1. 数字**
+![](imgs/1.png)
+![](imgs/2.png)
+
+        # 年龄最多三位数，且一定是正整数
+        age TINYINT UNSIGNED;
+
+        # 分数最高100.0，下面的4代表长度，1代表小数点后几位
+        score double(4, 1);
+**2. 字符串类型**
+![](imgs/3.png)
+
+- **上表的 varchar 是 可变长度，写错了**
+- char(n) 固定长度，char(4)不管存入几个字符，都将占用4个字节，性能好
+- varchar(n)是存入的实际字符数+1个字节（n<=255）或2个字节(n>255)，所以varchar(4),存入3个字符将占用4个字节，性能差
+  
+**3. 日期类型**
+![](imgs/3.png)
+#### 3.3.5 DDL-表操作-修改
+
+    # 添加字段
+    ALTER TABLE 表名 ADD 字段名 类型(长度) [COMMENT 注释] [约束];
+
+    # 修改数据类型
+    ALTER TABLE 表名 MODIFY 字段名 新数据类型(长度);
+
+    # 修改字段名和数据类型
+    ALTER TABLE 表名 CHANGE 旧字段名 新字段名 类型(长度) [COMMENT 注释] [约束];
+
+    # 删除字段
+    ALTER TABLE 表名 DROP 字段名;
+
+    # 修改表名
+    ALTER TABLE 表名 RENAME TO 新表名;
+#### 3.3.6 DDL-表操作-删除
+
+    # 删除表
+    DROP TABLE [IF EXISTS] 表名;
+
+    # 删除指定表，并重新创建该表，只留下表结构，没有数据了
+    TRUNCATE TABLE 表名;
+### 3.4 DML
+#### 3.4.1 DML-添加数据
+
+    # 给指定字段添加数据
+    INSERT INTO 表名(字段1, 字段2, ...) VALUES(值1, 值2, ...);
+
+    # 给全部字段添加数据
+    INSERT INTO 表名VALUES(值1, 值2, ...);
+
+    # 批量添加数据
+    INSERT INTO 表名(字段1, 字段2, ...) VALUES(值1, 值2, ...),(值1, 值2, ...)...;
+    INSERT INTO 表名VALUES(值1, 值2, ...),(值1, 值2, ...)...;
+#### 3.4.2 DML-修改数据
+    UPDATE 表名 SET 字段名1=值1, 字段名2=值2, ... [WHERE 条件];
+#### 3.4.3 DML-删除数据
+    DELETE FROM 表名 [WHERE 条件];
+### 3.5 DQL
+#### 3.5.1 DQL语法
+    SELECT 
+        字段列表
+    FROM
+        表名列表
+    WHERE
+        条件列表
+    GROUP BY
+        分组字段列表
+    HAVING
+        分组后条件列表
+    ORDER BY
+        排序字段列表
+    LIMIT
+        分页参数
+#### 3.5.2 DQL基本查询
+    # 查询多个字段
+    SELECT 字段1, 字段2, 字段3... FROM 表名;
+    SELECT * FROM 表名; // 慎用
+
+    # 设置别名
+    SELECT 字段1[[AS] 别名1], 字段2[[AS] 别名2] ... FROM表名;
+
+    # 去除重复记录
+    SELECT DISTINCT 字段1, 字段2, 字段3... FROM 表名;
+#### 3.5.3 DQL条件查询
+    # 语法
+    SELECT 字段1, 字段2, 字段3... FROM 表名 WHERE 条件列表;
+
+    # 条件
+    >, <, =, BETWEEN AND, IN(), LIKE 占位符, IS NULL, AND, OR, NOT
+    
+**注意：** 
+- **BETWEENAND 两端包含**
+- **SELECT * FROM emp WHERE age in(10,19,20);**
+- **占位符有：_ %, _数量严格，%表示任意数量字符**
+
+        SELECT * FROM emp WHERE name like '___';  // 查名字是3个字
+        SELECT * FROM emp WHERE idCard like '%9'; // 查结尾是9的
+#### 3.5.4 DQL聚合函数
+- 将一列数据作为整体，进行纵向计算
+- 常见：count, max, min, avg, sum
+
+
+        SELECT count(id) from emp;
+        SELECT avg(age) from emp;
+        SELECT min(age) from emp;
+        SELECT max(age) from emp;
+
+**注意：** 
+- null 不参与计算
+#### 3.5.5 DQL分组查询
+    # 语法
+    SELECT 字段列表 FROM 表名 [WHERE 条件] GROUP BY 分组字段名 [HAVING 分组后的过滤条件];
+
+    select gender,avg(age) from emp where age < 19 group by gender having avg(age)>10;
+**注意：** 
+- **where 是分组之前进行过滤，不满足where的条件，不参与分组，HAVING则是分组之后过滤。**
+- **where不能对聚合函数进行判断，而having可以。**
+- **ONLY_FULL_GROUP_BY 模式下，使用 GROUP BY 子句进行分组查询时，SELECT 列表中的非聚合列必须包含在 GROUP BY 子句中。**
+#### 3.5.5 DQL排序查询
+    # 语法
+    SELECT 字段列表 FROM 表名 ORDER BY 字段1 排序方式1, 字段2 排序方式2;
+
+    select * from emp order by age asc, workNum desc;
+
+    ASC 升序
+    DESC 降序
+#### 3.5.6 DQL分页查询
+    # 语法
+    SELECT 字段列表 FROM 表名 LIMIT 起始索引, 查询记录数;
+
+    # 查询第2页员工数据，每页展示10条记录
+    select * from emp limit 10,10;
+
+**注意：** 
+- **起始索引从0开始，起始索引=(查询页码-1)\*每页显示记录数**
+- **分页查询是数据库方言，MySQL用的是LIMIT**
+- **如果查询的是第一页数据，起始索引可以省略，直接简写为limit 10**
+#### 3.5.6 DQL执行顺序
+    
+    FROM
+        表名列表
+    WHERE
+        条件列表
+    GROUP BY
+        分组字段列表
+    HAVING
+        分组后条件列表 
+    SELECT 
+        字段列表
+    ORDER BY
+        排序字段列表
+    LIMIT
+        分页参数
+### 3.6 DCL
+#### 3.6.1 DCL-管理用户
+    # 查询用户
+    USE mysql;
+    SELECT * FROM user;
+
+    # 创建用户
+    CREATE USER '用户名'@'主机名' IDENTIFIED BY '密码';
+
+    # 修改用户密码
+    ALTER USER '用户名'@'主机名' IDENTIFIED WITH mysql_native_password BY '新密码';
+
+    # 删除用户
+    DROP USER '用户名'@'主机名';
+**注意：**
+- **主机名可以用%表示任意主机**
+#### 3.6.2 DCL-权限控制
+    # 查询权限
+    SHOW GRANTS FOR '用户名'@'主机名';
+
+    # 授予权限
+    GRANT 权限列表 ON 数据库名.表名 TO '用户名'@'主机名';
+
+    # 撤销权限
+    REVOKE 权限列表 ON 数据库名.表名 FROM '用户名'@'主机名';
